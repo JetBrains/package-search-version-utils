@@ -50,13 +50,13 @@ publishing {
             artifactId = project.name
 
             pom {
-                name.set("Package Search - API models")
-                description.set("API models for package search")
+                name.set("Package Search - Version Utils")
+                description.set("Utility to compare versions in Package Search")
                 url.set("https://package-search.jetbrains.com/")
                 scm {
-                    connection.set("scm:git:git://git.jetbrains.team/kpm/kpm.git")
-                    developerConnection.set("scm:git:ssh://git.jetbrains.team/kpm/kpm.git")
-                    url.set("https://jetbrains.team/p/kpm/code/kpm/")
+                    connection.set("scm:https://github.com/JetBrains/package-search-version-utils.git")
+                    developerConnection.set("scm:https://github.com/JetBrains/package-search-version-utils.git")
+                    url.set("https://github.com/JetBrains/package-search-version-utils")
                 }
             }
         }
