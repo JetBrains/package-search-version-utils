@@ -6,6 +6,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.20.0"
     id("org.jmailen.kotlinter") version "3.10.0"
 }
+
 group = "org.jetbrains.packagesearch"
 version = System.getenv("GITHUB_REF")?.substringAfterLast("/") ?: "2.5.0"
 
@@ -18,6 +19,21 @@ dependencies {
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
+}
+
+kotlin {
+    target {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
+}
+
+java {
+    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
 detekt {
