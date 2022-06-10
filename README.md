@@ -1,6 +1,8 @@
 # Package Search Version Utils
 
-TODO
+A collection of utils related to package versions.
+
+For now it only contains logic to detect if a package version name may be considered stable or not.
 
 ## Usage
 
