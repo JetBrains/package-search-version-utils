@@ -1,70 +1,82 @@
+@file:Suppress("UNUSED_VARIABLE")
+
 plugins {
-    val kotlinVersion = "1.7.10"
-    kotlin("jvm") version kotlinVersion
-    kotlin("plugin.serialization") version kotlinVersion
+    alias(packageSearchCatalog.plugins.kotlin.multiplatform)
+    alias(packageSearchCatalog.plugins.kotlin.plugin.serialization)
+    alias(packageSearchCatalog.plugins.detekt)
+    alias(packageSearchCatalog.plugins.kotlinter)
+    alias(packageSearchCatalog.plugins.packagesearch.build.config)
     `maven-publish`
-    id("io.gitlab.arturbosch.detekt") version "1.20.0"
-    id("org.jmailen.kotlinter") version "3.10.0"
+}
+
+kotlin {
+    jvm()
+    js(IR) {
+        browser()
+        nodejs()
+    }
+    ios()
+    macosArm64()
+    macosX64()
+    watchos()
+    tvos()
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(kotlin("stdlib-common"))
+                implementation(packageSearchCatalog.kotlinx.datetime)
+                implementation(packageSearchCatalog.kotlinx.serialization.core)
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                implementation(npm("date-fns", "2.30.0"))
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(packageSearchCatalog.junit.jupiter.api)
+                implementation(packageSearchCatalog.junit.jupiter.params)
+                implementation(packageSearchCatalog.assertk)
+                runtimeOnly(packageSearchCatalog.junit.jupiter.engine)
+            }
+        }
+        val appleMain by creating {
+            dependsOn(commonMain.get())
+        }
+        val watchosMain by getting {
+            dependsOn(appleMain)
+        }
+        val iosMain by getting {
+            dependsOn(appleMain)
+        }
+        val macosMain by creating {
+            dependsOn(appleMain)
+        }
+        val macosArm64Main by getting {
+            dependsOn(macosMain)
+        }
+        val macosX64Main by getting {
+            dependsOn(macosMain)
+        }
+        val tvosMain by getting {
+            dependsOn(appleMain)
+        }
+    }
 }
 
 group = "org.jetbrains.packagesearch"
 version = System.getenv("GITHUB_REF")?.substringAfterLast("/") ?: "2.5.0"
 
 dependencies {
-    detektPlugins("ch.qos.logback:logback-classic:1.2.11")
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.20.0")
-
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.8.2")
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
-
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
-}
-
-kotlin {
-    target {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
-}
-
-java {
-    targetCompatibility = JavaVersion.VERSION_1_8
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
-
-detekt {
-    toolVersion = "1.20.0"
-    autoCorrect = !isCi
-    source = files("src/main/java", "src/main/kotlin")
-    config = files("detekt.yml")
-    buildUponDefaultConfig = true
-}
-
-kotlinter {
-    reporters = arrayOf("html", "checkstyle", "plain")
-}
-
-val sourcesJar by tasks.registering(Jar::class) {
-    group = "publishing"
-    from(kotlin.sourceSets.main.get().kotlin.sourceDirectories)
-    archiveClassifier.set("sources")
-    destinationDirectory.set(buildDir.resolve("artifacts"))
+    detektPlugins(packageSearchCatalog.logback.classic)
+    detektPlugins(packageSearchCatalog.detekt.formatting)
 }
 
 publishing {
     publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            artifact(sourcesJar)
-
-            version = project.version.toString()
-            groupId = group.toString()
-            artifactId = project.name
-
+        withType<MavenPublication> {
             pom {
                 name.set("Package Search - Version Utils")
                 description.set("Utility to compare versions in Package Search")
@@ -89,11 +101,8 @@ publishing {
     }
 }
 
-val isCi
-    get() = System.getenv("CI") != null || System.getenv("CONTINUOUS_INTEGRATION") != null
-
 tasks {
-    test {
+    withType<Test> {
         useJUnitPlatform()
     }
 }
