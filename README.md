@@ -1,4 +1,7 @@
-# Package Search Version Utils
+# DEPRECATED
+This library has been moved [here](https://github.com/JetBrains/package-search-api-models/tree/master/version-utils)!
+
+# Package Search Version Utils [![obsolete JetBrains project](https://jb.gg/badges/obsolete.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 
 A collection of utils related to package versions.
 
